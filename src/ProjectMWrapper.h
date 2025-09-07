@@ -42,6 +42,24 @@ public:
     PresetPlaylist& Playlist();
 
     /**
+     * @brief Detaches the current playlist and loads a single preset.
+     * @param presetData The preset data to load.
+     * @param errorMessage The error message from projectM if loading failed.
+     * @return true if the preset was loaded successfully, false if an error occurred.
+     */
+    bool LoadPresetData(const std::string& presetData, std::string& errorMessage);
+
+    /**
+     * @brief Detaches the internal playlist, so it no longer controls the preset playback.
+     */
+    void UnbindPlaylist();
+
+    /**
+     * @brief Binds the internal playlist and resets the preset lock to the user setting.
+     */
+    void BindPlaylist();
+
+    /**
      * Renders a single projectM frame.
      */
     void RenderFrame();
@@ -77,10 +95,28 @@ public:
     static std::string ProjectMBuildVersion();
 
     /**
-     * @brief Returns the libprojectM version this applications currently runs with.
+     * @brief Returns the libprojectM version this application currently runs with.
      * @return A string with the libprojectM runtime library version.
      */
     static std::string ProjectMRuntimeVersion();
+
+    /**
+     * @brief Returns the full path of the currently displayed preset.
+     * @return The full path of the currently displayed preset, or an empty string if the idle preset is loaded.
+     */
+    std::string CurrentPresetFileName() const;
+
+    /**
+     * @brief Toggles handling of playback control notifications.
+     * @param enable true to enable handling of playback control notifications, false to disable.
+     */
+    void EnablePlaybackControl(bool enable);
+
+    /**
+     * @brief Locks or unlocks the current preset without changing the user setting.
+     * @param lock true to lock the current preset, false to enable auto-switching.
+     */
+    void HardLockPreset(bool lock);
 
     /**
      * Copies the full path of the current preset into the OS clipboard.
@@ -91,6 +127,8 @@ private:
     void PlaybackControlNotificationHandler(const Poco::AutoPtr<Notification::PlaybackControl>& notification);
 
     void AudioDataAvailableNotificationHandler(const Poco::AutoPtr<Notification::AudioDataAvailable>& notification);
+
+    static void PresetSwitchFailedEvent(const char* presetFilename, const char* message, void* context);
 
     std::vector<std::string> GetPathListWithDefault(const std::string& baseKey, const std::string& defaultPath);
 
@@ -111,6 +149,10 @@ private:
 
     projectm_handle _projectM{nullptr}; //!< Pointer to the projectM instance used by the application.
     std::unique_ptr<PresetPlaylist> _playlist; //!< The currently active playlist.
+    bool _playbackControlEnabled{true}; //!< If false, any playback control notifications are ignored.
+
+    bool _presetLoadFailed{false};
+    std::string _presetLoadFailedMessage;
 
     uint32_t _audioChannels{0}; //!< Number of audio channels of the current capture device.
     std::vector<float> _audioStagingBuffer; //!< Buffer which receives audio data from the capture implementation.

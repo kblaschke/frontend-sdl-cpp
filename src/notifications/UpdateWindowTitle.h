@@ -10,7 +10,15 @@ namespace Notification {
 class UpdateWindowTitle : public Poco::Notification
 {
 public:
+    UpdateWindowTitle() = default;
+
+    explicit UpdateWindowTitle(std::string customTitle)
+        : _customTitle(std::move(customTitle))
+    {}
+
     std::string name() const override;
+
+    std::string _customTitle;
 };
 
 } // namespace Notification

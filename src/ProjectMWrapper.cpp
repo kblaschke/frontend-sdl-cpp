@@ -151,6 +151,39 @@ PresetPlaylist& ProjectMWrapper::Playlist()
     throw std::runtime_error("Playlist not available (ProjectMWrapper subsystem not yet initialized?)");
 }
 
+bool ProjectMWrapper::LoadPresetData(const std::string& presetData, std::string& errorMessage)
+{
+    UnbindPlaylist();
+
+    projectm_set_preset_switch_failed_event_callback(_projectM, PresetSwitchFailedEvent, this);
+    projectm_load_preset_data(_projectM, presetData.c_str(), false);
+
+    if (_presetLoadFailed)
+    {
+        errorMessage = _presetLoadFailedMessage;
+        _presetLoadFailed = false;
+        return false;
+    }
+
+    return true;
+}
+
+void ProjectMWrapper::UnbindPlaylist()
+{
+    if (_playlist)
+    {
+        _playlist->Disconnect();
+    }
+}
+
+void ProjectMWrapper::BindPlaylist()
+{
+    if (_playlist)
+    {
+        _playlist->Connect(_projectM);
+    }
+}
+
 int ProjectMWrapper::TargetFPS()
 {
     return _projectMConfigView->getInt("fps", 60);
@@ -227,12 +260,53 @@ std::string ProjectMWrapper::ProjectMRuntimeVersion()
     return projectMRuntimeVersion;
 }
 
+std::string ProjectMWrapper::CurrentPresetFileName() const
+{
+    if (!_playlist || _playlist->Empty())
+    {
+        return {};
+    }
+
+    const std::string& presetPath = _playlist->CurrentItem().Path();
+
+    if (presetPath.substr(0, 5) == "idle:")
+    {
+        return {};
+    }
+
+    return presetPath;
+}
+
+void ProjectMWrapper::EnablePlaybackControl(bool enable)
+{
+    _playbackControlEnabled = enable;
+}
+
+void ProjectMWrapper::HardLockPreset(bool lock)
+{
+    if (lock)
+    {
+        projectm_set_preset_locked(_projectM, true);
+    }
+    else
+    {
+        projectm_set_preset_locked(_projectM, _userConfig->getBool("projectM.presetLocked", false));
+    }
+}
+
 void ProjectMWrapper::PresetFileNameToClipboard() const
 {
     if (_playlist && !_playlist->Empty())
     {
         SDL_SetClipboardText(_playlist->CurrentItem().Path().c_str());
     }
+}
+
+void ProjectMWrapper::PresetSwitchFailedEvent(const char* presetFilename, const char* message, void* context)
+{
+    auto that = reinterpret_cast<ProjectMWrapper*>(context);
+    that->_presetLoadFailedMessage = message;
+    that->_presetLoadFailed = true;
 }
 
 void ProjectMWrapper::PlaybackControlNotificationHandler(const Poco::AutoPtr<Notification::PlaybackControl>& notification)

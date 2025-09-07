@@ -173,10 +173,13 @@ void ProjectMGUI::Draw()
 
     if (_visible)
     {
-        _mainMenu.Draw();
-        _settingsWindow.Draw();
-        _aboutWindow.Draw();
-        _helpWindow.Draw();
+        if (!_presetEditorGUI.Draw())
+        {
+            _mainMenu.Draw();
+            _settingsWindow.Draw();
+            _aboutWindow.Draw();
+            _helpWindow.Draw();
+        }
     }
 
     ImGui::Render();
@@ -210,6 +213,13 @@ void ProjectMGUI::PopFont()
     ImGui::PopFont();
 }
 
+void ProjectMGUI::ShowPresetEditor(const std::string& presetFileName)
+{
+    _presetChooser.reset();
+
+    _presetEditorGUI.Show(presetFileName);
+}
+
 void ProjectMGUI::ShowSettingsWindow()
 {
     _settingsWindow.Show();
@@ -227,7 +237,7 @@ void ProjectMGUI::ShowHelpWindow()
 
 void ProjectMGUI::ShowPresetChooser()
 {
-    if (_presetChooser)
+    if (_presetEditorGUI || _presetChooser)
     {
         return;
     }

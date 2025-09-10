@@ -7,6 +7,8 @@
 
 #include "notifications/Quit.h"
 
+#include "imgui.h"
+
 #include <Poco/NotificationCenter.h>
 
 namespace Editor {

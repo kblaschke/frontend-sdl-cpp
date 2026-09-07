@@ -132,13 +132,13 @@ public:
         std::string mDeclaration;
     };
 
-    typedef std::string String;
-    typedef std::unordered_map<std::string, Identifier> Identifiers;
-    typedef std::unordered_set<std::string> Keywords;
-    typedef std::map<int, std::string> ErrorMarkers;
-    typedef std::unordered_set<int> Breakpoints;
-    typedef std::array<ImU32, (unsigned) PaletteIndex::Max> Palette;
-    typedef uint8_t Char;
+    using String = std::string;
+    using Identifiers =std::unordered_map<std::string, Identifier>;
+    using Keywords = std::unordered_set<std::string>;
+    using ErrorMarkers = std::map<int, std::string>;
+    using Breakpoints = std::unordered_set<int>;
+    using Palette = std::array<ImU32, (unsigned) PaletteIndex::Max>;
+    using Char = uint8_t;
 
     struct Glyph {
         Char mChar;

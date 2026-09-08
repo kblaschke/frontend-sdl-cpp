@@ -40,6 +40,16 @@ void FileChooser::CurrentDirectory(const std::string& path)
     ChangeDirectory(path);
 }
 
+std::string FileChooser::SaveFilename() const
+{
+    return _saveFilename;
+}
+
+void FileChooser::SaveFilename(const std::string& filename)
+{
+    _saveFilename = filename;
+}
+
 void FileChooser::Context(const std::string& context)
 {
     _context = context;
@@ -141,6 +151,11 @@ bool FileChooser::Draw()
             ImGui::EndListBox();
         }
 
+        if (_mode == Mode::SaveFile)
+        {
+            //ImGui::InputText("##filename", &_currentDirString[0], IM_ARRAYSIZE(pathBuffer));
+        }
+
         ImGui::PushStyleColor(ImGuiCol_Button, 0xFF000080);
         if (ImGui::Button(ICON_FA_BAN " Cancel"))
         {
@@ -150,7 +165,18 @@ bool FileChooser::Draw()
         }
         ImGui::PopStyleColor();
         ImGui::SameLine();
-        if (ImGui::Button(ICON_FA_CHECK " Select"))
+
+        const char* acceptButtonText;
+        if (_mode == Mode::SaveFile)
+        {
+            acceptButtonText = ICON_FA_FLOPPY_DISK " Save";
+        }
+        else
+        {
+            acceptButtonText = ICON_FA_CHECK " Select";
+        }
+
+        if (ImGui::Button(acceptButtonText))
         {
             for (auto index : _selectedFileIndices)
             {

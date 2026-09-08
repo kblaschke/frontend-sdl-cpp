@@ -214,6 +214,13 @@ void RenderLoop::KeyEvent(const SDL_KeyboardEvent& event, bool down)
             break;
 #endif
 
+        case SDLK_e:
+            if (modifierPressed)
+            {
+                _projectMGui.ShowPresetEditor(_projectMWrapper.CurrentPresetFileName());
+            }
+            break;
+
         case SDLK_f:
             if (modifierPressed)
             {
@@ -237,7 +244,11 @@ void RenderLoop::KeyEvent(const SDL_KeyboardEvent& event, bool down)
             break;
 
         case SDLK_n:
-            if (!modifierPressed)
+            if (_keyStates._ctrlPressed && _keyStates._shiftPressed && !_keyStates._altPressed)
+            {
+                _projectMGui.ShowPresetEditor("");
+            }
+            else if (!modifierPressed)
             {
                 Poco::NotificationCenter::defaultCenter().postNotification(new Notification::PlaybackControl(Notification::PlaybackControl::Action::NextPreset, _keyStates._shiftPressed));
             }

@@ -232,6 +232,14 @@ void ProjectMGUI::ShowPresetChooser()
         return;
     }
 
+    // PresetPlaylist::CurrentIndex() throws PlaylistEmptyException on an empty playlist,
+    // which would terminate the application. There's nothing to search in that case anyway.
+    if (_projectMWrapper->Playlist().Empty())
+    {
+        _toast = std::make_unique<ToastMessage>("No presets loaded", 3.0f);
+        return;
+    }
+
     _presetChooser = std::make_unique<PresetChooser>(_projectMWrapper->Playlist().Items(), _projectMWrapper->Playlist().CurrentIndex());
 }
 

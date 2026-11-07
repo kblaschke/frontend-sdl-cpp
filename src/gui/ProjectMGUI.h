@@ -134,6 +134,7 @@ private:
     ImFont* _toastFont{nullptr}; //!< Toast message font (sans-serif, larger).
 
     uint64_t _lastFrameTicks{0}; //!< Tick count of the last frame (see SDL_GetTicks64)
+    bool _wasIdle{true}; //!< True if no ImGui frame was rendered last time, i.e. input events may have piled up.
 
     float _userScalingFactor{1.0f}; //!< The user-defined UI scaling factor.
     float _textScalingFactor{0.0f}; //!< The text scaling factor.

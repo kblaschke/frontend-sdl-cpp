@@ -131,7 +131,22 @@ void ProjectMGUI::Draw()
     // Don't render UI at all if there's no need.
     if (!_toast && !_visible && !_presetChooser)
     {
+        _wasIdle = true;
         return;
+    }
+
+    if (_wasIdle)
+    {
+        // While idle, ImGui::NewFrame() isn't called, so every key/text event forwarded via
+        // ProcessInput() piles up in ImGui's input queue. Without clearing, the first frames after
+        // waking up replay that backlog (trickled over several frames): old letters land in the
+        // preset search field and an old ESC/Enter press closes it again immediately.
+        // Also release any keys ImGui still thinks are held, since their key-up events may be
+        // among the discarded ones.
+        io.ClearEventsQueue();
+        io.ClearInputKeys();
+        io.ClearInputMouse();
+        _wasIdle = false;
     }
 
     if (_userScalingFactor != GetClampedUserScalingFactor())

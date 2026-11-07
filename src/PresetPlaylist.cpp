@@ -74,9 +74,13 @@ void PresetPlaylist::CurrentIndex(ItemList::size_type index, bool hardcut)
     projectm_playlist_set_position(_projectMPlaylist, _currentIndex, hardcut);
 }
 
-void PresetPlaylist::ShuffleEnabled(bool enabled) const
+void PresetPlaylist::ShuffleEnabled(bool enabled)
 {
     poco_assert(_projectMPlaylist);
+    // Next(), Previous() and Random() temporarily change the projectM playlist's shuffle flag and
+    // restore it from _shuffle afterwards. If _shuffle isn't kept in sync here, it stays false and
+    // shuffle gets turned off after the first N/P/R key press.
+    _shuffle = enabled;
     projectm_playlist_set_shuffle(_projectMPlaylist, enabled);
 }
 

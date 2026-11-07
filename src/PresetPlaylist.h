@@ -183,7 +183,7 @@ public:
      * Sets the shuffle mode.
      * @param enabled The new value of the shuffle flag
      */
-    void ShuffleEnabled(bool enabled) const;
+    void ShuffleEnabled(bool enabled);
 
     /**
      * Returns whether shuffle mode is enabled or not.

@@ -232,7 +232,11 @@ void RenderLoop::KeyEvent(const SDL_KeyboardEvent& event, bool down)
             {
                 _sdlRenderingWindow.NextDisplay();
             }
-            _projectMGui.ShowPresetChooser();
+            else
+            {
+                // Plain "m" opens the preset search. Ctrl/Cmd+M only moves the window to the next display.
+                _projectMGui.ShowPresetChooser();
+            }
             break;
 
         case SDLK_n:
